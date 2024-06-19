@@ -1,19 +1,30 @@
 const socket = io()
 
-const messageBox = document.querySelector("#messageBox")
+const messageBox = document.querySelector("#message-form")
 const messageInput = messageBox.querySelector("input")
 const sendButton = messageBox.querySelector("button")
 const locationButton = document.querySelector("#send-location")
 const messages = document.querySelector("#messages")
 const messageTemplate = document.querySelector("#message-template").innerHTML
+const locationTemplate = document.querySelector("#location-message-template").innerHTML
 
 
 socket.on('message', (message) => {
 
     const messageHtml = Mustache.render(messageTemplate, {
-        message
+        message: message.text,
+        createdAt: moment(message.createdAt).format('MMM D, h:mm')
     })
     messages.insertAdjacentHTML("beforeend", messageHtml)
+})
+
+socket.on('locationMessage', (location) => {
+
+    const locationHtml = Mustache.render(locationTemplate, {
+        url: location.url,
+        createdAt: moment(location.createdAt).format('MMM D, h:mm')
+    })
+    messages.insertAdjacentHTML('beforeend', locationHtml)
 })
 
 messageBox.addEventListener('submit', e => {
