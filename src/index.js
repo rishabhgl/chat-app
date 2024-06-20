@@ -18,24 +18,27 @@ app.get('/', (req, res) => {})
 
 io.on('connection', (socket) => {
 
-    socket.emit('message', generateMessage('Welcome!'))
-    socket.broadcast.emit('message', generateMessage("A user has entered the chat!"))
-
+    socket.on('join', (username, room) => {
+        socket.join(room)
+        socket.emit('message', generateMessage('Welcome!'))
+        socket.broadcast.to(room).emit('message', generateMessage(`${username} has entered the chat!`))
+    })
+    
     socket.on('sendMessage', (message, callback) => {
 
         const filter = new Filter()
         if (filter.isProfane(message)) return callback('Profanity is not allowed!')
-        io.emit("message", generateMessage(message))
+        io.to(room).emit("message", generateMessage(message))
         callback()
     })
 
     socket.on('sendLocation', (pos, callback) => {
-        io.emit('locationMessage', generateLocationMessage(pos))
+        io.to(room).emit('locationMessage', generateLocationMessage(pos))
         callback()
     })
 
     socket.on('disconnect', () => {
-        io.emit('message', generateMessage('A user has left the chat!'))
+        io.to(room).emit('message', generateMessage('A user has left the chat!'))
     })
 
 })

@@ -8,6 +8,8 @@ const messages = document.querySelector("#messages")
 const messageTemplate = document.querySelector("#message-template").innerHTML
 const locationTemplate = document.querySelector("#location-message-template").innerHTML
 
+const {username, room} = Qs.parse(location.search, { ignoreQueryPrefix: true})
+socket.emit('join', { username, room })
 
 socket.on('message', (message) => {
 
